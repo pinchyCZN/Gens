@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fr /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I ".\directx" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fr /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
@@ -54,7 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib wsock32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib ddraw.lib dsound.lib dinput.lib dxguid.lib winmm.lib libs\zlib.lib libs\htmlhelp.lib release\main68k.obj release\sub68k.obj /nologo /subsystem:windows /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib wsock32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib ddraw.lib dsound.lib dinput.lib dxguid.lib winmm.lib libs\zlib.lib libs\htmlhelp.lib /nologo /subsystem:windows /machine:I386
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "gens - Win32 Debug"
@@ -1087,6 +1087,56 @@ SOURCE=.\resource\gens_small.bmp
 # Begin Source File
 
 SOURCE=.\Gens.rc
+# End Source File
+# End Group
+# Begin Group "starscream_asm"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\starscream_asm\main68k.asm
+
+!IF  "$(CFG)" == "gens - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputDir=.\starscream_asm
+OutDir=.\Release
+InputPath=.\starscream_asm\main68k.asm
+InputName=main68k
+
+"$(OutDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	nasmw -i $(InputDir) $(InputDir)\$(InputName).asm -f win32 -o $(OutDir)\$(InputName).obj
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "gens - Win32 Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\starscream_asm\sub68k.asm
+
+!IF  "$(CFG)" == "gens - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputDir=.\starscream_asm
+OutDir=.\Release
+InputPath=.\starscream_asm\sub68k.asm
+InputName=sub68k
+
+"$(OutDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	nasmw -i $(InputDir) $(InputDir)\$(InputName).asm -f win32 -o $(OutDir)\$(InputName).obj
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "gens - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # End Target
