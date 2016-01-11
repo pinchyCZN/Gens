@@ -51,6 +51,22 @@ int (*Update_Frame)();
 int (*Update_Frame_Fast)();
 
 
+int copy_screen()
+{
+	int i;
+	int *screen=(int*)MDscreen32;
+	for(i=0;i<336*240;i++){
+		int r,g,b,c;
+		unsigned short p=MD_Screen[i];
+		b=(p>>11)&0x1F;
+		g=(p>>5)&0x3F;
+		r=p&0x1F;
+		c=(b<<(16+3))|(g<<(8+2))|(r<<3);
+		screen[i]=c;
+	}
+	return 0;
+}
+
 void Put_Info(char *Message, int Duree)
 {
 	if (Show_Message)
@@ -486,6 +502,7 @@ int Flip(HWND hWnd)
 					RectDest.bottom = 240 << Render_FS;
 				}
 
+				copy_screen();
 				if (FS_VSync)
 				{
 					lpDDS_Flip->Blt(&RectDest, lpDDS_Back, &RectSrc, DDBLT_WAIT | DDBLT_ASYNC, NULL);
@@ -633,22 +650,8 @@ int Flip(HWND hWnd)
 
 				if (!vb) lpDD->WaitForVerticalBlank(DDWAITVB_BLOCKBEGIN, 0);
 			}
-
-			{
-				int i;
-				int *screen=(int*)MDscreen32;
-				for(i=0;i<336*240;i++){
-					int r,g,b,c;
-					unsigned short p=MD_Screen[i];
-					b=(p>>11)&0x1F;
-					g=(p>>5)&0x3F;
-					r=p&0x1F;
-					c=(b<<(16+3))|(g<<(8+2))|(r<<3);
-					screen[i]=c;
-				}
-			}
+			copy_screen();
 			rval = lpDDS_Primary->Blt(&RectDest, lpDDS_Back, &RectSrc, DDBLT_WAIT | DDBLT_ASYNC, NULL);
-//			rval = lpDDS_Primary->Blt(&RectDest, lpDDS_Back, &RectSrc, NULL, NULL);
 		}
 	}
 
@@ -847,13 +850,18 @@ int Update_Emulation(HWND hWnd)
 	{
 		if (Sound_Enable)
 		{
+			extern int fast_forward;
 			int count=0;
+			DWORD tick=0;
+			if(fast_forward)
+				tick=GetTickCount();
+
 			while (WP == Get_Current_Seg())
 				Sleep(Sleep_Time);
 			
 			RP = Get_Current_Seg();
 
-			while (WP != RP)
+			while (fast_forward || (WP != RP))
 			{
 				Write_Sound_Buffer(NULL);
 				WP = (WP + 1) & (Sound_Segs - 1);
@@ -868,13 +876,19 @@ int Update_Emulation(HWND hWnd)
 					Update_Frame();
 					Flip(hWnd);
 				}
-				count++;
-				if(count>300)
-					break;
+				if(fast_forward){
+					DWORD delta=GetTickCount()-tick;
+					if(delta>250)
+						break;
+					count++;
+					if(count>60)
+						break;
+				}
 			}
 		}
 		else
 		{
+			extern int fast_forward;
 			if (CPU_Mode) current_div = 20;
 			else current_div = 16 + (Over_Time ^= 1);
 
@@ -899,8 +913,24 @@ int Update_Emulation(HWND hWnd)
 				Flip(hWnd);
 			}
 			else
-			{}
-			//	Sleep(Sleep_Time);
+				Sleep(Sleep_Time);
+
+			if(fast_forward){
+				int i;
+				LARGE_INTEGER tick,delta;
+				QueryPerformanceCounter(&tick);
+				for(i=0;i<5;i++){
+					Update_Controllers();
+					QueryPerformanceCounter(&delta);
+					if((delta.QuadPart-tick.QuadPart)<100000){
+						Update_Frame_Fast();
+					}else{
+						tick.QuadPart=delta.QuadPart;
+						Update_Frame();
+						Flip(hWnd);
+					}
+				}
+			}
 		}
 	}
 

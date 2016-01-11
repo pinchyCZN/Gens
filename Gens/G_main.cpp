@@ -118,6 +118,7 @@ int Gens_Running = 0;
 int WinNT_Flag = 0;
 int Gens_Priority;
 int SS_Actived;
+int fast_forward=0;
 
 
 POINT Window_Pos;
@@ -2889,6 +2890,9 @@ long PASCAL WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						Clear_Sound_Buffer();
 					}
 					return 0;
+				case ID_FASTFORWARD:
+					fast_forward=!fast_forward;
+					break;
 			}
 			break;
 

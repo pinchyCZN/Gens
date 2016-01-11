@@ -332,6 +332,7 @@
 #define ID_HELP_MEGACD                  40236
 #define ID_HELP_FAQ                     40237
 #define ID_HELP_KEYS                    40238
+#define ID_FASTFORWARD                  40240
 #define ID_HELP_LANG                    40250
 #define ID_EMULATION_PAUSED             40300
 
@@ -340,7 +341,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        152
-#define _APS_NEXT_COMMAND_VALUE         40240
+#define _APS_NEXT_COMMAND_VALUE         40241
 #define _APS_NEXT_CONTROL_VALUE         1171
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
